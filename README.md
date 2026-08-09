@@ -1,9 +1,13 @@
 # tizenMngr
 
-Security research on a Samsung UN55MU6290 smart TV (TizenOS 3.0, firmware 1410).
-This repository is the **public documentation** for the research: findings,
-analysis, and methodology only. No exploit code, no live-network specifics,
-no credentials.
+**tizenMngr is a Tizen TV management app** (TizenBrew module management, full
+root app management/installation, and a kernel/root-exploit runner) for
+Samsung Tizen smart TVs. Development is **on hold until full, repeatable root
+access** is achieved — see [roadmap.md](roadmap.md).
+
+This repository currently holds the **public documentation** for the security
+research that is the prerequisite for the app: findings, analysis, and
+methodology only. No exploit code, no live-network specifics, no credentials.
 
 All work was performed on the owner's own device for research purposes.
 Tizen 3.0 is EOL (2017); no further firmware patches exist.
