@@ -59,4 +59,4 @@ D-Bus interface:
   the ONLY clean read-back (`GetItem`/`GetStrItem`/`GetFString` mask the value
   bytes as `[Invalid UTF-8]`).
 - Used to fix a corrupted white-balance item (green gain SID 84 = 1 → pink
-  tint). Recovery procedure: `docs/../pink-tint-fix.md` (project-local notes).
+  tint). Recovery procedure: `fixes/tint-fix.md`.

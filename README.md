@@ -10,18 +10,29 @@ Tizen 3.0 is EOL (2017); no further firmware patches exist.
 
 ## Document Index
 
+Research findings live in [docs/research/](docs/research/).
+
 | Doc | Topic |
 |-----|-------|
-| [01 — Overview](docs/01-overview.md) | Device, goal, constraints, terminology |
-| [02 — Access](docs/02-access.md) | The access model: dev-mode, widget service, Node, D-Bus |
-| [03 — D-Bus Security](docs/03-dbus-security.md) | CVE-2018-16262..16268 audit + system-bus policy analysis |
-| [04 — Execution Model](docs/04-execution-model.md) | SFD-UEP kernel exec gate and its consequences |
-| [05 — Kernel Assessment](docs/05-kernel.md) | Kernel 4.1.10 facts + CVE feasibility |
-| [06 — JIT Sandbox](docs/06-jit.md) | V8 JIT shellcode primitive + syscall whitelist |
-| [07 — Privileged Services](docs/07-privileged-services.md) | ps_mount/ps_insmod/ps_mknod credential model + appbinary-manager |
-| [08 — SUID & Daemons](docs/08-suid-daemons.md) | wasutility (SUID), kfactoryd, rmdemon, canalysis-daemon |
-| [09 — Tooling](docs/09-tools.md) | WGT signer, hand-rolled D-Bus client |
-| [10 — Status & Plan](docs/10-status.md) | Research status, verdicts, open items |
+| [01 — Overview](docs/research/01-overview.md) | Device, goal, constraints, terminology |
+| [02 — Access](docs/research/02-access.md) | The access model: dev-mode, widget service, Node, D-Bus |
+| [03 — D-Bus Security](docs/research/03-dbus-security.md) | CVE-2018-16262..16268 audit + system-bus policy analysis |
+| [04 — Execution Model](docs/research/04-execution-model.md) | SFD-UEP kernel exec gate and its consequences |
+| [05 — Kernel Assessment](docs/research/05-kernel.md) | Kernel 4.1.10 facts + CVE feasibility |
+| [06 — JIT Sandbox](docs/research/06-jit.md) | V8 JIT shellcode primitive + syscall whitelist |
+| [07 — Privileged Services](docs/research/07-privileged-services.md) | ps_mount/ps_insmod/ps_mknod credential model + appbinary-manager |
+| [08 — SUID & Daemons](docs/research/08-suid-daemons.md) | wasutility (SUID), kfactoryd, rmdemon, canalysis-daemon |
+| [09 — Tooling](docs/research/09-tools.md) | WGT signer, hand-rolled D-Bus client, NVRAM access |
+| [10 — Status & Plan](docs/research/10-status.md) | Research status, verdicts, open items |
+| [Fixes — Tint Fix](docs/research/fixes/tint-fix.md) | NVRAM white-balance recovery (pink tint) |
+
+Planned/future work lives in [docs/planned/](docs/planned/).
+
+## Tools
+
+- [tools/tv.sh](tools/tv.sh) — run a shell command on the TV via the widget
+  exec endpoint (`TV_IP=192.168.1.145 ./tools/tv.sh '<cmd>'`). Requires the
+  widget service (`kdbuswgt01`) installed and running on the TV.
 
 ## Headline Findings
 
