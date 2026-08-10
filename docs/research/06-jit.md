@@ -45,6 +45,7 @@ engine needs at runtime.
   in the JIT region) — `fs`/`net`/`child_process` all work normally. But Node
   has no API for arbitrary syscalls, and JIT→libc is blocked. So: JIT can't do
   dangerous syscalls, Node can't make arbitrary syscalls.
-- Pivot candidates instead: D-Bus to root daemons, world-writable root
-  device nodes, and the appbinary-manager mount surface (see
-  [07 — Privileged Services](07-privileged-services.md)).
+- Pivot candidates instead: D-Bus to root daemons and world-writable `/dev`
+  nodes (see [11 — System Bus Surface](11-system-bus-surface.md)). ps_* and
+  kernel-exploit paths remain gated ([07](07-privileged-services.md),
+  [10](10-status.md)).

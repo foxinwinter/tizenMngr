@@ -60,3 +60,8 @@ D-Bus interface:
   bytes as `[Invalid UTF-8]`).
 - Used to fix a corrupted white-balance item (green gain SID 84 = 1 → pink
   tint). Recovery procedure: `fixes/tint-fix.md`.
+
+**Security note:** this interface is **ungated** on the system bus from the
+widget — persistent config tampering (panel, hotel mode, feature flags) without
+root. Not code execution; can brick-by-config. Automation-service commands can
+have hardware side effects; probe carefully.

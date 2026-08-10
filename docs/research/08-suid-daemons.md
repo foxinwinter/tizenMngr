@@ -10,61 +10,75 @@ Only three SUID binaries on the live TV:
 | `/usr/lib/chromium-efl/chrome-sandbox` | Chromium sandbox helper |
 | `/usr/lib/dbus/dbus-daemon-launch-helper` | group `dbus` only (not our gid) |
 
+(Firmware rootfs sweep also reports no other setuid binaries in the image.)
+
 ## wasutility (SUID root) — dead end
 
 `/usr/bin/wasutility` = `-rwsr-xr-x root root`, exec-able from the widget.
-Identity: **AppRecoveryTool** (`org.tizen.webappservice-0.1`,
-`src/Tool/AppRecoveryTool.cpp`). Full disassembly; all option handlers are
-**fixed-argument**:
+Identity: **AppRecoveryTool** (`org.tizen.webappservice-0.1`). Full
+disassembly; all option handlers are **fixed-argument**:
 
-- Most cases `exec` a **missing** binary (`wrt-installer` absent from FW) with
-  a hardcoded `PATH=` env — dead.
-- `-r` runs `/usr/bin/pkgcmd --clear-all -t wgt` — exists, but fixed args only.
-- `-a`/`-d` use a TMGSettings D-Bus client — fails live
-  (`PkgMgr Client Creation Failed`, SMACK-gated).
-- `-n` execs fixed-argv `/bin/chown`/`/bin/chsmack` on
-  `.webappservice.db[-journal]`; the SQL source (`AppsDB.conf`) lives in a
-  SMACK-protected dir — not attacker-controllable.
-- `-m` reads `/proc/<pid>/vd_memstat` (Samsung proc file) — root read only.
+- Most cases `exec` a **missing** binary (`wrt-installer` absent from FW).
+- `-r` → fixed `pkgcmd --clear-all -t wgt`.
+- `-a`/`-d` → TMGSettings D-Bus client fails live (SMACK-gated).
+- `-n` → fixed `chown`/`chsmack` on webappservice DB paths; SQL source not
+  attacker-controllable.
+- `-m` → read `/proc/<pid>/vd_memstat` only.
 
-The exec launcher uses `execve` (no shell), so no argument injection. Verdict:
-**no attacker-controlled root exec, no controllable file write.**
+`execve` only, no shell — **no attacker-controlled root exec or write.**
 
-## kfactoryd — root daemon, live R/W channel
+## kfactoryd — factory channel, not kernel memory
 
-- `/usr/bin/kfactoryd` (root) + world-writable `/dev/kfactory`
-  (char 244,0, mode 0666). **20-byte packet protocol, live R/W to a root
-  daemon confirmed.**
-- Commands: `0x1234` GetData, `0x4321` sysinfo, `0xabcd` SetData.
-- The promising `exec_shell`/`write_vmcoreinfo` path (`echo ... >
-  /sys/kernel/vmcoreinfo` via `/bin/sh -c` from `/etc/prd_info.ini`) is **gated
-  by `/sys/kernel/kexec_crash_loaded`, which does NOT exist on the live TV** →
-  ramdump_init bails. Not exploitable.
-- `main`'s `system()` only runs a fixed `oom_score_adj` echo — not
-  attacker-controlled.
-- Open: what consumes `SetData(0xabcd)` (libfactory-interface.so not yet
-  reversed); sysinfo may leak build/version.
+- `/usr/bin/kfactoryd` (root) + world-writable `/dev/kfactory` (char 244:0,
+  mode 0666).
+- 20-byte packet protocol; live open/read/write as uid 5001 confirmed.
+- **2026-08-09 live test:** traffic is kernel-initiated read requests for
+  **factory register addresses**; userland responds to matched requests. The
+  kernel controls the address space — **not** an arbitrary kernel-memory write
+  primitive. Prior “modprobe_path via kfactory” hypothesis **closed**.
+- Ramdump / `exec_shell` path gated by missing `kexec_crash_loaded` on device.
+- NVRAM-style access also available via factory-service D-Bus (preferred for
+  research).
 
 ## rmdemon — cloud client, not a LAN listener
 
-`/usr/bin/rmdemon` (org.tizen.remote-management v0.2):
-- **Outbound HTTPS client** to Samsung's RM cloud
-  (`https://rm.samsungqbe.com`), protocol v2.5, pincode-authenticated.
-- No `bind`/`accept`/`listen` strings → no local TCP listener. The "network
-  root daemon" hypothesis was wrong.
-- Server-initiated commands (file write, packet dump, 100 MB temp cap) run as
-  root but require: RM feature enabled + MITM of the cloud domain + HTTPS
-  cert trust + completing the pincode flow. **Not unauthenticated.**
+Outbound HTTPS to Samsung RM cloud; pincode-authenticated. No local listener.
+Root actions require cloud trust + pincode — not unauthenticated LAN exploit.
 
-## D-Bus root daemons
+## D-Bus root daemons (selected)
 
-- `org.tizen.tv.contentsanalysis.server` = **canalysis-daemon**, one of the
-  two SMACK-authorized callers of `ps_mount`/`ps_insmod`/`ps_mknod`. Object
-  `/org/tizen/tv/contentsanalysis`, iface `org.tizen.tv.contentsanalysis`
-  with `call_app(command:i,param1:t,param2:i,param3:s,reminder:u)`,
-  `get_handle`, `set_hp_status`, etc. Runs as root. **Active research target.**
-- deviced, comss.server, contentsanalysis run as root; their `/proc` entries
-  are SMACK-hidden (empty status/cmdline). No methods found via introspection
-  of deviced.
-- `org.tizen.tv.factory-service` — NVRAM read/write (see
-  [09 — Tooling](09-tools.md) → NVRAM section).
+### canalysis-daemon — not a live vector here
+
+`org.tizen.tv.contentsanalysis.server` — intended whitelisted caller for
+ps_mount (and potentially ps_insmod/ps_mknod **if** credential XML were
+loaded). **`call_app(...)`** and related methods exist in firmware.
+
+Live audit: process **not present** in `ps` output; ps_* auth gate **closed**
+(no credentials). Marked dead for this device/firmware snapshot.
+
+### deviced — DoS, not LPE
+
+`org.tizen.system.deviced` (root). Ungated power/reboot/display/key surfaces;
+Tzip mount gated (widget fails SMACK check). Live reboot from widget
+confirmed. See [11 — System Bus Surface](11-system-bus-surface.md).
+
+### org.tizen.tv.factory-service
+
+Ungated NVRAM/config read-write (`SetParameter`, `GetUidItem`, …). Persistent
+config tampering vector; no code exec. See [09 — Tooling](09-tools.md).
+
+### TIFSDaemon
+
+Factory-service binary audited: all `system()` / `ExecuteShell` paths use
+**hardcoded command literals** only — no D-Bus-controlled shell strings.
+
+## World-writable `/dev` nodes (uid 5001)
+
+Openable from widget: `/dev/kfactory`, `/dev/i2c-0`…`i2c-9`, `/dev/fuse`,
+`/dev/eeprom`, `/dev/sdp_mem`, `/dev/bptime`, log devices, etc.
+
+- **kfactory** — factory data only (above).
+- **i2c-*** — remaining live candidate for driver ioctl bugs (kernel 4.1.10);
+  no exec required to open the node.
+- **sdp_mem / bptime** — ioctl/mmap allocators, not `/dev/mem`-style arbitrary
+  access.

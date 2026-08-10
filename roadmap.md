@@ -64,7 +64,11 @@ current.
 
 ## Current research status
 
-See [docs/research/10-status.md](docs/research/10-status.md). TL;DR: owner-level
-JS exec + full D-Bus reach achieved; root not yet achieved. Kernel CVEs
-(Dirty COW etc.) are in range but gated behind the native-exec wall
+See [docs/research/10-status.md](docs/research/10-status.md) and
+[docs/research/11-system-bus-surface.md](docs/research/11-system-bus-surface.md).
+TL;DR: owner-level JS exec + full D-Bus **reach** achieved; **root not
+achieved.** Widget→root D-Bus paths (ps_*, pkgmgr admin, kfactory memory,
+JIT→kernel) are closed on FW 1410. Remaining research: `/dev/i2c-*` ioctl
+class, offline firmware patch, engineer/factory RE. Kernel CVEs (Dirty COW
+etc.) remain in range but gated behind UEP
 ([docs/research/04-execution-model.md](docs/research/04-execution-model.md)).

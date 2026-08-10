@@ -24,10 +24,11 @@ Research findings live in [docs/research/](docs/research/).
 | [04 — Execution Model](docs/research/04-execution-model.md) | SFD-UEP kernel exec gate and its consequences |
 | [05 — Kernel Assessment](docs/research/05-kernel.md) | Kernel 4.1.10 facts + CVE feasibility |
 | [06 — JIT Sandbox](docs/research/06-jit.md) | V8 JIT shellcode primitive + syscall whitelist |
-| [07 — Privileged Services](docs/research/07-privileged-services.md) | ps_mount/ps_insmod/ps_mknod credential model + appbinary-manager |
-| [08 — SUID & Daemons](docs/research/08-suid-daemons.md) | wasutility (SUID), kfactoryd, rmdemon, canalysis-daemon |
+| [07 — Privileged Services](docs/research/07-privileged-services.md) | ps_* credential model, live auth gate, appbinary-manager |
+| [08 — SUID & Daemons](docs/research/08-suid-daemons.md) | wasutility, kfactoryd, deviced, factory-service |
 | [09 — Tooling](docs/research/09-tools.md) | WGT signer, hand-rolled D-Bus client, NVRAM access |
-| [10 — Status & Plan](docs/research/10-status.md) | Research status, verdicts, open items |
+| [10 — Status & Plan](docs/research/10-status.md) | Research status, verdicts, next lanes |
+| [11 — System Bus Surface](docs/research/11-system-bus-surface.md) | Aug 2026 live bus sweep (reach vs escalate) |
 | [Fixes — Tint Fix](docs/research/fixes/tint-fix.md) | NVRAM white-balance recovery (pink tint) |
 
 Planned/future work lives in [docs/planned/](docs/planned/).
@@ -42,17 +43,18 @@ Planned/future work lives in [docs/planned/](docs/planned/).
 
 - The TV's **SFD-UEP** kernel module signature-gates *every* `execve`/`mmap` of
   code on writable filesystems (RSA-2048). No unsigned native code can run from
-  `/tmp`, `/var`, `/opt`, or `/home`. A loop-mounted **read-only** squashfs is
-  **not** a bypass — UEP enforces per-file, and exec is still denied.
-- The system/session D-Bus buses are **kdbus-only** (no unix sockets), and the
-  bus is reachable from the sandboxed widget via the TV's own signed
-  `dbus-send`/`busctl` binaries. This gives unprivileged code real D-Bus
-  access to root services (CVE-2018-16266 class).
-- `ps_insmod` / `ps_mknod` (root) wrap `/sbin/insmod` and `/bin/mknod` with
-  **no command-path regex** — only a caller-exe whitelist. The gate is the
-  calling process identity, not the argument.
-- Kernel CVE feasibility on 4.1.10 ranks Dirty COW (CVE-2016-5195) highest,
-  but all kernel paths are gated behind the native-exec wall.
+  `/tmp`, `/var`, `/opt`, or `/home`. Loop-mounted read-only squashfs is **not**
+  a bypass — UEP is per-file.
+- **Owner foothold achieved:** widget service command exec + signed `/usr/bin/node`
+  (uid 5001) + kdbus D-Bus via `dbus-send`/`busctl`.
+- **Root not achieved** on FW 1410 after exhaustive D-Bus sweep: ps_* daemons
+  load **no credential XML** (all `CallCommand` auth-rejected); pkgmgr admin
+  enforced; kfactory is factory-register I/O only; confirmed sandbox impact is
+  **reboot DoS** + **ungated factory NVRAM tampering**.
+- Kernel module signing is **off**, but `ps_insmod` never runs without ps_*
+  whitelist config — theoretical insmod chain blocked at daemon auth.
+- Kernel CVEs (Dirty COW, etc.) remain **in range** but gated behind the UEP
+  native-exec wall unless exploiting via driver/ioctl or offline firmware patch.
 
 ## Related
 

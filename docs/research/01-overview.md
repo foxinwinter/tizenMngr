@@ -46,6 +46,9 @@ that chain.
 ## Outcome summary
 
 Owner-level JS execution (via signed `/usr/bin/node`) and full kdbus D-Bus
-access from the sandboxed widget were both achieved. Root escalation has not
-been achieved; the remaining vectors and their status are in
-[10 — Status & Plan](10-status.md).
+access from the sandboxed widget were both achieved. **Root escalation has not
+been achieved.** A 2026-08-09 system-bus sweep closed most D-Bus LPE paths
+(ps_* auth gate empty, pkgmgr admin enforced, kfactory not arbitrary memory).
+Remaining lanes: driver/ioctl surfaces, offline firmware patch, and deeper
+factory/engineer RE — see [10 — Status & Plan](10-status.md) and
+[11 — System Bus Surface](11-system-bus-surface.md).

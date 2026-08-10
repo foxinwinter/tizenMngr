@@ -56,6 +56,10 @@ Policies inspected from `/etc/dbus-1/system.d/` + `/usr/share/dbus-1/system.conf
 control — needs the WM interface analysis to become escalation), 16263/64/65
 partial. The family alone does not obviously yield root.
 
+**Live follow-up (2026-08-09):** pkgmgr `.admin` methods remain denied from the
+widget (`<check>` fires even though `security-manager`/`cynara` are stub units).
+Full bus sweep: [11 — System Bus Surface](11-system-bus-surface.md).
+
 ## Live call demonstrated (CVE-2018-16266 class)
 
 From the unprivileged widget, a real D-Bus method call to the root-uid WM
