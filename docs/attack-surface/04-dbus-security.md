@@ -1,4 +1,4 @@
-# 03 — D-Bus Security
+# 04 — D-Bus Security
 
 ## Transport: kdbus only
 
@@ -58,7 +58,7 @@ partial. The family alone does not obviously yield root.
 
 **Live follow-up (2026-08-09):** pkgmgr `.admin` methods remain denied from the
 widget (`<check>` fires even though `security-manager`/`cynara` are stub units).
-Full bus sweep: [11 — System Bus Surface](11-system-bus-surface.md).
+Full bus sweep: [System Bus Surface](09-system-bus-surface.md).
 
 ## Live call demonstrated (CVE-2018-16266 class)
 
@@ -88,7 +88,7 @@ effects (`EventKey`/`EventFreeze`/`DPMS`/`ChangeZoneRotation` map to the
 
 - `com.safe.ps_insmod`, `com.safe.ps_mknod`, `com.safe.ps_mount`,
   `com.safe.ps_umount` — **root** (Samsung dev-tool helpers; see
-  [07 — Privileged Services](07-privileged-services.md))
+  [Privileged Services](05-privileged-services.md))
 - `enlightenment` — **root**
 - `org.tizen.FocusServer` — **root**
 - `fi.w1.wpa_supplicant1`, `org.pulseaudio.Server`,

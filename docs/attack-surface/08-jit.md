@@ -1,4 +1,4 @@
-# 06 — JIT Sandbox
+# 08 — JIT Sandbox
 
 Node v4.4.3's V8 JIT (CVE-2017-5121 class) gives uid-5001 arbitrary ARM code
 execution via a fake-ArrayBuffer write primitive into a JIT Code object
@@ -46,6 +46,6 @@ engine needs at runtime.
   has no API for arbitrary syscalls, and JIT→libc is blocked. So: JIT can't do
   dangerous syscalls, Node can't make arbitrary syscalls.
 - Pivot candidates instead: D-Bus to root daemons and world-writable `/dev`
-  nodes (see [11 — System Bus Surface](11-system-bus-surface.md)). ps_* and
-  kernel-exploit paths remain gated ([07](07-privileged-services.md),
-  [10](10-status.md)).
+  nodes (see [System Bus Surface](09-system-bus-surface.md)). ps_* and
+  kernel-exploit paths remain gated ([Privileged Services](05-privileged-services.md),
+  [Status & Plan](../status/11-status.md)).

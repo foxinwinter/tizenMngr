@@ -38,7 +38,7 @@ current.
 ## Roadmap (ordered after gate opens)
 
 ### Phase 0 — Root enablement & persistence
-- [ ] Ship the root chain as a repeatable exploit module (see `docs/research/`).
+- [ ] Ship the root chain as a repeatable exploit module (see `docs/`).
 - [ ] Establish a root shell / daemon channel the app can drive.
 - [ ] Determine persistence options (survives reboot, dev-mode toggle, etc.).
 
@@ -64,11 +64,14 @@ current.
 
 ## Current research status
 
-See [docs/research/10-status.md](docs/research/10-status.md) and
-[docs/research/11-system-bus-surface.md](docs/research/11-system-bus-surface.md).
+See [docs/index.md](docs/index.md), [Status & Plan](docs/status/11-status.md) and
+[System Bus Surface](docs/attack-surface/09-system-bus-surface.md).
 TL;DR: owner-level JS exec + full D-Bus **reach** achieved; **root not
 achieved.** Widget→root D-Bus paths (ps_*, pkgmgr admin, kfactory memory,
-JIT→kernel) are closed on FW 1410. Remaining research: `/dev/i2c-*` ioctl
+JIT→kernel) are closed on FW 1410. The app-launch-pool "native-exec unlock"
+does **not** escalate (pool runs uid 5001, gate rejects the widget) — see
+[App Launch Pool](docs/attack-surface/10-app-launch-pool.md). Remaining
+research: gate-passing launcher (litewebappservice), `/dev/i2c-*` ioctl
 class, offline firmware patch, engineer/factory RE. Kernel CVEs (Dirty COW
 etc.) remain in range but gated behind UEP
-([docs/research/04-execution-model.md](docs/research/04-execution-model.md)).
+([Execution Model](docs/platform/03-execution-model.md)).

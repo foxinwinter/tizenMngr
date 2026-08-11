@@ -1,4 +1,4 @@
-# 05 — Kernel Assessment
+# 07 — Kernel Assessment
 
 ## Facts
 
@@ -25,6 +25,6 @@ Ranking if native exec were ever solved: **5195 > 8655 > 0728**.
 ## The gate: native-exec wall
 
 All kernel exploits are gated behind the writable-mount exec block
-([04 — Execution Model](04-execution-model.md)). Without unsigned native code
+([Execution Model](../platform/03-execution-model.md)). Without unsigned native code
 running, no local kernel exploit can be exercised. Details on the one partial
-escape (Node JIT) in [06 — JIT Sandbox](06-jit.md).
+escape (Node JIT) in [JIT Sandbox](08-jit.md).

@@ -1,4 +1,4 @@
-# 10 — Status & Plan
+# 11 — Status & Plan
 
 Last major update: **2026-08-09** (live system-bus sweep + ps_* auth gate audit).
 
@@ -24,6 +24,10 @@ Last major update: **2026-08-09** (live system-bus sweep + ps_* auth gate audit)
 | canalysis-daemon → ps_* | DONE | **DEAD** — not running on live TV; ps_* gate closed anyway |
 | pkgmgr admin via D-Bus | DONE | `<check>` enforcement works (negative live test) |
 | deviced (root D-Bus) | DONE | ungated reboot/power-off = **DoS only**, no LPE |
+| App launch pool exec gate | DONE | `{User,System,System::Privileged}` SMACK whitelist via SO_PEERCRED; widget rejected |
+| App launch pool "uid 200" premise | DONE | **FALSIFIED live** — pool runs uid 5001; children uid 5001 CapEff=0 |
+| litewebappservice as pool sender | OPEN | gate-passing caller found; payload→bundle (`__AUL_LOADER_PATH__`) untested |
+| Pool socket MITM (`/run/aul/daemons/5001` 777) | OPEN | we own the dir; does not bypass SO_PEERCRED gate |
 | factory-service NVRAM | DONE | ungated read/write (config tampering, demonstrated) |
 | com.samsung MethodCall RPC | DONE | connection killed (`EPIPE`) on disallowed senders |
 | systemd1 control | DONE | `StartTransientUnit` etc. → AccessDenied |
@@ -38,31 +42,35 @@ From uid 5001 / sandboxed widget context, verified **without** root:
   (ungated; live DoS demonstrated).
 - **Persistent factory NVRAM tampering** via `org.tizen.tv.factory-service`
   (`SetParameter`, hotel mode, etc.) — can corrupt panel config; recovery
-  documented in [fixes/tint-fix.md](fixes/tint-fix.md).
+  documented in [fixes/tint-fix.md](../fixes/tint-fix.md).
 - **Information disclosure**: D-Bus introspection, systemd unit inventory,
   Enlightenment WM control (CVE-2018-16266 class), low-impact audio/popup
   surfaces.
 
 High-impact sinks (module load, mknod, package install, systemd unit start,
 Samsung TV RPC) are gated at the service or SMACK layer. See
-[11 — System Bus Surface](11-system-bus-surface.md).
+[System Bus Surface](../attack-surface/09-system-bus-surface.md).
 
 ## Active / next steps
 
 Widget → root paths through D-Bus and signed native exec are **largely
 exhausted** on FW 1410. Remaining research lanes:
 
-1. **`/dev/i2c-*` ioctl surface** — world-open to uid 5001; kernel 4.1.10 +
+1. **App launch pool** (see [App Launch Pool](../attack-surface/10-app-launch-pool.md)):
+   litewebappservice (`org.tizen.tv.litewebappservice.server.interface.launch_app`,
+   `payload s` arg) as a gate-passing sender — does its payload reach the pool
+   bundle (`__AUL_LOADER_PATH__`)? Socket MITM on `/run/aul/daemons/5001` (777).
+2. **`/dev/i2c-*` ioctl surface** — world-open to uid 5001; kernel 4.1.10 +
    SoC drivers = classic driver-bug class (needs controlled fuzzing from owner
    context, no unsigned exec required to *open* the node).
-2. **Unidentified root listener (port 15500)** — map to daemon/service offline;
+3. **Unidentified root listener (port 15500)** — map to daemon/service offline;
    widget TCP connect SMACK-blocked, but identity informs firmware RE.
-3. **Offline firmware patch / reflash** — inject ps_* credential XML, patch a
+4. **Offline firmware patch / reflash** — inject ps_* credential XML, patch a
    root daemon, or ship a persistent root helper in extracted rootfs (see
    working-tree `patch-methods.md`, not in this repo).
-4. **Enlightenment `wm.Test`** — root-context window/key effects; no escalation
+5. **Enlightenment `wm.Test`** — root-context window/key effects; no escalation
    chain documented yet.
-5. **Factory / engineer UI** — Advanced-menu auth tied to NVRAM SID 2105;
+6. **Factory / engineer UI** — Advanced-menu auth tied to NVRAM SID 2105;
    map whether engineer mode exposes capabilities beyond NVRAM.
 
 ## What was ruled out
@@ -81,3 +89,6 @@ exhausted** on FW 1410. Remaining research lanes:
 - Driving canalysis-daemon — absent from live process list during audit.
 - Root executes a file the widget can write — hunt found none.
 - TIFSDaemon — no attacker-controllable `system()` / shell path.
+- App launch pool as native-exec unlock — gate rejects the widget; LAUNCH
+  children gain no uid/caps (pool runs uid 5001, not 200); "system" premise
+  falsified live (see [App Launch Pool](../attack-surface/10-app-launch-pool.md)).

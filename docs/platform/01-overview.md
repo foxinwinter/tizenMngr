@@ -29,7 +29,7 @@ that chain.
 - No destructive operations on the TV (factory reset, firmware flash) without
   explicit request.
 - Native code execution from writable mounts is blocked at the kernel level
-  (see [04 — Execution Model](04-execution-model.md)).
+  (see [Execution Model](03-execution-model.md)).
 
 ## Terminology
 
@@ -50,5 +50,5 @@ access from the sandboxed widget were both achieved. **Root escalation has not
 been achieved.** A 2026-08-09 system-bus sweep closed most D-Bus LPE paths
 (ps_* auth gate empty, pkgmgr admin enforced, kfactory not arbitrary memory).
 Remaining lanes: driver/ioctl surfaces, offline firmware patch, and deeper
-factory/engineer RE — see [10 — Status & Plan](10-status.md) and
-[11 — System Bus Surface](11-system-bus-surface.md).
+factory/engineer RE — see [Status & Plan](../status/11-status.md) and
+[System Bus Surface](../attack-surface/09-system-bus-surface.md).

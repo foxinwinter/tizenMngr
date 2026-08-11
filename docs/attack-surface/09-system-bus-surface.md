@@ -1,9 +1,9 @@
-# 11 — System Bus Surface (2026-08-09 sweep)
+# 09 — System Bus Surface (2026-08-09 sweep)
 
 Live and firmware analysis of what the uid-5001 widget can **reach** on the
 system bus versus what actually **escalates**. Complements
-[03 — D-Bus Security](03-dbus-security.md) and
-[10 — Status & Plan](10-status.md).
+[D-Bus Security](04-dbus-security.md) and
+[Status & Plan](../status/11-status.md).
 
 ## Default policy is permissive
 
@@ -35,7 +35,7 @@ including would-be whitelisted agents like `canalysis-daemon`. Kernel module
 signing is OFF (`/sbin/insmod` would load unsigned `.ko`), but the ps_*
 gate never opens without that XML (which would itself require root to install).
 
-See [07 — Privileged Services](07-privileged-services.md).
+See [Privileged Services](05-privileged-services.md).
 
 ## org.tizen.pkgmgr
 
@@ -76,7 +76,7 @@ interfaces. Deep-dive (offline binary + live):
 
 - `SetParameter`, `GetUidItem`, `GetItem`, `SetHotelModeInfo`, `Executes`, …
 - Persistent across reboot; demonstrated for white-balance recovery and
-  (accidentally) config corruption — see [fixes/tint-fix.md](fixes/tint-fix.md).
+  (accidentally) config corruption — see [fixes/tint-fix.md](../fixes/tint-fix.md).
 - No arbitrary code execution; can brick-by-config or flip feature flags.
 
 ## org.tizen.tv.automation-service
@@ -102,7 +102,7 @@ widget.**
 | SWU / OTA daemons | Signed update packages (UEP); not bypassable without keys |
 | `services-fw` control file | Under `/opt/usr/apps` — not widget-writable |
 | zone-manager (LXC) | Root TCP listener; SMACK blocks widget connect |
-| World-writable `/dev` nodes | `kfactory`, `i2c-*`, `fuse`, etc. — see [08 — SUID & Daemons](08-suid-daemons.md) |
+| World-writable `/dev` nodes | `kfactory`, `i2c-*`, `fuse`, etc. — see [SUID & Daemons](06-suid-daemons.md) |
 
 ## Writable footprint (widget)
 

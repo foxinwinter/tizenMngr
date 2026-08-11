@@ -1,4 +1,4 @@
-# 07 — Privileged Services
+# 05 — Privileged Services
 
 ## The ps_* daemons
 

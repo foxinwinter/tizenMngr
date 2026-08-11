@@ -1,4 +1,4 @@
-# 08 — SUID & Daemons
+# 06 — SUID & Daemons
 
 ## SUID audit
 
@@ -60,12 +60,12 @@ Live audit: process **not present** in `ps` output; ps_* auth gate **closed**
 
 `org.tizen.system.deviced` (root). Ungated power/reboot/display/key surfaces;
 Tzip mount gated (widget fails SMACK check). Live reboot from widget
-confirmed. See [11 — System Bus Surface](11-system-bus-surface.md).
+confirmed. See [System Bus Surface](09-system-bus-surface.md).
 
 ### org.tizen.tv.factory-service
 
 Ungated NVRAM/config read-write (`SetParameter`, `GetUidItem`, …). Persistent
-config tampering vector; no code exec. See [09 — Tooling](09-tools.md).
+config tampering vector; no code exec. See [Access Channels & Tooling](../platform/02-access-tooling.md).
 
 ### TIFSDaemon
 

@@ -1,4 +1,4 @@
-# 04 — Execution Model (SFD-UEP)
+# 03 — Execution Model (SFD-UEP)
 
 ## The exec gate
 
@@ -26,7 +26,7 @@ upstream).
 - A loop-mounted **read-only** squashfs is **NOT** a bypass: exec of a payload
   inside it → `rc=126 Operation not permitted`. UEP enforces **per-file /
   per-inode**, not mount-writability. (Tested via the appbinary-manager mount
-  round-trip, see [07 — Privileged Services](07-privileged-services.md).)
+  round-trip, see [Privileged Services](../attack-surface/05-privileged-services.md).)
 - Kernel strings confirmed in the firmware uImage: `SfdUepVerifyExecutableBinary`,
   `SfdUepVerifyDynamicLibrary`, `SfdCheckFileIsInRW`,
   `SfdUepReadSignatureFromFile`, `SfdPerformBlocking`,
